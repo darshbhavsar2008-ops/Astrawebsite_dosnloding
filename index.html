@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#05070b">
+<meta name="description" content="ASTRA AI — an independent personal intelligence project by Darsh Bhavsar, Founder, Creator and Developer.">
+<title>ASTRA — A New Intelligence</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #05070b;
+  --fg: #f0f2f5;
+  --muted: #8a94a5;
+  --blue: #a6c9ff;
+  --cyan: #a7e7f0;
+  --border: rgba(211,226,255,.14);
+  --mono: "DM Mono", monospace;
+  --display: "Space Grotesk", sans-serif;
+  --body: "Manrope", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg); scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--fg);
+  background: var(--bg);
+  font-family: var(--body);
+  overflow-x: hidden;
+}
+body.intro-active { overflow: hidden; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
+::selection { background: #c4dcff; color: #080a10; }
+button, a { -webkit-tap-highlight-color: transparent; }
+
+#universe {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -5;
+  pointer-events: none;
+}
+#light-field {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 75% 14%, rgba(59,91,153,.15), transparent 34%),
+    radial-gradient(ellipse at 10% 60%, rgba(68,117,151,.08), transparent 32%),
+    linear-gradient(180deg, #080a10 0%, #05070b 70%, #07090d 100%);
+}
+#grain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: .035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.pointer-glow {
+  position: fixed;
+  z-index: -1;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(99,153,232,.075), transparent 70%);
+  transform: translate(-50%,-50%);
+  opacity: 0;
+  transition: opacity .4s;
+}
+@media (pointer:fine) { body:hover .pointer-glow { opacity: 1; } }
+
+.mono {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+.muted { color: var(--muted); }
+.blue { color: var(--blue); }
+
+/* =========================================================
+   OPENING CINEMATIC
+   ========================================================= */
+
+#cinematic {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #03050a;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  transition: opacity 1.6s ease, visibility 1.6s ease;
+}
+#cinematic.dismissed {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.cine-grid {
+  position: absolute;
+  inset: -70%;
+  background-image:
+    linear-gradient(rgba(174,199,238,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(174,199,238,.045) 1px, transparent 1px);
+  background-size: 65px 65px;
+  transform: perspective(500px) rotateX(65deg) translateY(12%);
+  mask-image: linear-gradient(transparent 5%, #000 40%, transparent 90%);
+  animation: gridTravel 20s linear infinite;
+}
+@keyframes gridTravel {
+  to { background-position: 0 130px; }
+}
+.cine-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 5%, rgba(0,0,0,.2) 45%, #03050a 85%);
+}
+.cine-coordinate {
+  position: absolute;
+  color: #697589;
+  line-height: 1.9;
+}
+.cine-coordinate.tl { top: 25px; left: 26px; }
+.cine-coordinate.tr { top: 25px; right: 26px; text-align: right; }
+.cine-coordinate.bl { bottom: 27px; left: 26px; }
+.cine-coordinate.br { bottom: 27px; right: 26px; text-align: right; }
+
+.cine-center {
+  position: relative;
+  z-index: 2;
+  width: min(95vw, 750px);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.cine-emblem {
+  position: relative;
+  width: clamp(200px, 35vw, 350px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  margin-bottom: 35px;
+  opacity: 0;
+  animation: emblemArrival 3s .2s cubic-bezier(.16,.8,.2,1) forwards;
+}
+@keyframes emblemArrival {
+  0% { opacity: 0; transform: scale(.25) rotate(-50deg); filter: blur(18px); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) rotate(0); filter: blur(0); }
+}
+.cine-ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(189,214,255,.35);
+  border-radius: 50%;
+  box-shadow: inset 0 0 40px rgba(125,175,245,.035);
+}
+.cine-ring.r2 {
+  inset: 8%;
+  border-style: dashed;
+  border-color: rgba(205,224,255,.2);
+  animation: spin 65s linear infinite;
+}
+.cine-ring.r3 {
+  inset: -7%;
+  border-color: rgba(177,206,255,.17);
+  transform: rotateX(68deg) rotateZ(-25deg);
+}
+.cine-ring.r4 {
+  inset: 12%;
+  transform: rotateX(67deg) rotateZ(48deg);
+  border-color: rgba(183,219,255,.5);
+  animation: spinReverse 32s linear infinite;
+}
+.cine-ring.r5 {
+  inset: -3%;
+  transform: rotateX(72deg) rotateZ(72deg);
+  border-color: rgba(210,229,255,.22);
+}
+@keyframes spin { to { rotate: 360deg; } }
+@keyframes spinReverse { to { rotate: -360deg; } }
+
+.cine-core {
+  width: 43%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  position: relative;
+  background:
+    radial-gradient(circle at 28% 22%, white 0%, #d9e9ff 3%, #8aa4ca 11%, #38465e 29%, #111723 54%, #03050a 75%);
+  box-shadow:
+    0 0 2px 1px rgba(230,241,255,.75),
+    0 0 32px rgba(152,194,255,.48),
+    0 0 110px rgba(98,149,225,.22),
+    inset -20px -20px 35px #020307;
+  animation: coreBreath 5s ease-in-out infinite;
+}
+.cine-core::before {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  border: 1px solid rgba(222,237,255,.48);
+  border-radius: 50%;
+}
+.cine-core::after {
+  content: "";
+  position: absolute;
+  left: -45%;
+  top: 49%;
+  width: 190%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #fff, #a8d1ff, transparent);
+  box-shadow: 0 0 15px #a7cfff;
+  transform: rotate(-28deg);
+}
+@keyframes coreBreath {
+  0%,100% { box-shadow: 0 0 2px 1px rgba(230,241,255,.75), 0 0 32px rgba(152,194,255,.4), 0 0 90px rgba(98,149,225,.17), inset -20px -20px 35px #020307; }
+  50% { box-shadow: 0 0 3px 1px white, 0 0 48px rgba(152,194,255,.65), 0 0 135px rgba(98,149,225,.3), inset -20px -20px 35px #020307; }
+}
+
+.cine-satellite {
+  position: absolute;
+  top: 15%;
+  left: 14%;
+  width: 8px;
+  height: 8px;
+  background: #e7f2ff;
+  border-radius: 50%;
+  box-shadow: 0 0 18px #b6d5ff;
+}
+.cine-satellite.s2 { top: 77%; left: 83%; width: 5px; height: 5px; }
+.cine-satellite.s3 { top: 38%; left: 95%; width: 3px; height: 3px; }
+
+.cine-overline {
+  color: #a8bad4;
+  opacity: 0;
+  animation: fadeIn 1s 1.8s forwards;
+}
+.cine-wordmark {
+  font: 500 clamp(55px, 13vw, 125px)/.95 var(--display);
+  letter-spacing: .2em;
+  margin-left: .2em;
+  margin-top: 20px;
+  background: linear-gradient(110deg, #fff 0%, #8c9aae 24%, #f8fbff 45%, #9fc8ff 57%, #fff 70%);
+  background-size: 250% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: 0;
+  animation: wordArrival 1.7s 1.3s forwards, metalFlow 7s 3s linear infinite;
+}
+@keyframes wordArrival {
+  from { opacity: 0; transform: translateY(30px); filter: blur(12px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes metalFlow { to { background-position: 250% center; } }
+.cine-tagline {
+  margin-top: 23px;
+  color: #a6b2c4;
+  font-size: clamp(11px, 2vw, 14px);
+  letter-spacing: .18em;
+  opacity: 0;
+  animation: fadeIn 1.2s 2s forwards;
+}
+.cine-founder {
+  margin-top: 36px;
+  color: #6f7e93;
+  opacity: 0;
+  animation: fadeIn 1.2s 2.5s forwards;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+.cine-bottom {
+  position: absolute;
+  z-index: 3;
+  bottom: 23px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(240px, 60vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+}
+.cine-progress {
+  width: 100%;
+  height: 1px;
+  background: rgba(210,229,255,.14);
+}
+.cine-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #dceaff;
+  box-shadow: 0 0 10px #a5caff;
+  animation: loadLine 18s linear forwards;
+}
+@keyframes loadLine { to { width: 100%; } }
+.cine-enter {
+  color: #a5b2c5;
+  border: 0;
+  background: transparent;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: color .2s;
+}
+.cine-enter:hover { color: white; }
+
+/* =========================================================
+   GLOBAL NAVIGATION
+   ========================================================= */
+
+.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: 100%;
+  padding: 25px 5vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font: 600 13px var(--display);
+  letter-spacing: .22em;
+}
+.brand-icon {
+  width: 27px;
+  height: 27px;
+  border: 1px solid #bfd4f7;
+  border-radius: 50%;
+  position: relative;
+}
+.brand-icon::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: #e7f2ff;
+  box-shadow: 0 0 12px #b2d3ff;
+}
+.brand-icon::after {
+  content: "";
+  position: absolute;
+  inset: 4px -4px;
+  border: 1px solid rgba(185,215,255,.55);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+.navlinks {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.5vw, 32px);
+  font: 10px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: #a0abba;
+}
+.navlinks a { transition: color .2s; }
+.navlinks a:hover { color: white; }
+.nav-download {
+  padding: 12px 17px;
+  border: 1px solid rgba(216,230,255,.28);
+  color: #f0f5ff !important;
+}
+.nav-download:hover { background: rgba(200,220,255,.1); }
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+#site {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 1.5s ease, transform 1.5s ease;
+}
+#site.visible { opacity: 1; transform: none; }
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  padding: 150px 7vw 80px;
+  display: grid;
+  grid-template-columns: 1.04fr .96fr;
+  align-items: center;
+  gap: 2vw;
+  overflow: hidden;
+}
+.hero::after {
+  content: "ASTRA / EXPERIENCE 001";
+  position: absolute;
+  bottom: 26px;
+  right: 5vw;
+  color: #647187;
+  font: 9px var(--mono);
+  letter-spacing: .16em;
+}
+.hero-copy { position: relative; z-index: 4; }
+.overline {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: #b2c7e5;
+}
+.overline::before {
+  content: "";
+  height: 1px;
+  width: 28px;
+  background: #a7caff;
+  box-shadow: 0 0 8px rgba(151,192,255,.4);
+}
+.hero h1 {
+  margin: 37px 0 28px;
+  font: 500 clamp(60px, 8.6vw, 124px)/.88 var(--display);
+  letter-spacing: -.09em;
+}
+.hero h1 span { display: block; }
+.hero h1 .stroke {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(224,234,250,.67);
+}
+.hero h1 .gradient {
+  background: linear-gradient(100deg, #fff 15%, #9bb4d8 50%, #d7e7ff 75%);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.hero-description {
+  max-width: 455px;
+  font-size: 13px;
+  line-height: 2;
+  color: #969faf;
+}
+.hero-buttons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 33px;
+}
+.btn {
+  min-height: 49px;
+  padding: 0 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  font: 10px var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(222,235,255,.22);
+  background: transparent;
+  color: #eef4ff;
+  cursor: pointer;
+  transition: transform .25s, background .25s, border .25s, color .25s;
+}
+.btn:hover { transform: translateY(-3px); border-color: #e1ecff; }
+.btn-light { background: #e9eef6; color: #10151e; border-color: #e9eef6; }
+.btn-light:hover { background: white; }
+.btn .arrow { font-size: 15px; }
+.hero-facts {
+  margin-top: 35px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  color: #7b8799;
+}
+.hero-facts span { font: 9px var(--mono); letter-spacing: .09em; }
+.hero-facts i { width: 3px; height: 3px; border-radius: 50%; background: #a6caff; }
+
+/* 3D-LIKE CORE */
+
+.core-stage {
+  position: relative;
+  min-height: 600px;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+.core-stage::before {
+  content: "";
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  background: radial-gradient(circle, rgba(65,106,174,.09), transparent 60%);
+  filter: blur(20px);
+}
+.core-halo {
+  width: min(41vw, 500px);
+  aspect-ratio: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  animation: haloFloat 8s ease-in-out infinite;
+}
+@keyframes haloFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-13px); }
+}
+.core-halo::before,
+.core-halo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(193,215,249,.18);
+}
+.core-halo::after {
+  inset: 8%;
+  border-style: dashed;
+  border-color: rgba(193,215,249,.17);
+  animation: spin 100s linear infinite;
+}
+.core-ticks {
+  position: absolute;
+  inset: -1%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(199,220,250,.48) 0deg .18deg, transparent .2deg 5deg);
+  mask: radial-gradient(circle, transparent 0 47%, black 47.4% 48.2%, transparent 48.7%);
+}
+.core-orbit {
+  position: absolute;
+  width: 117%;
+  height: 39%;
+  border-radius: 50%;
+  border: 1px solid rgba(203,226,255,.52);
+  transform: rotate(-35deg);
+}
+.core-orbit.o2 {
+  width: 119%;
+  height: 65%;
+  transform: rotate(58deg);
+  border-color: rgba(181,210,255,.25);
+}
+.core-orbit.o3 {
+  width: 85%;
+  height: 111%;
+  transform: rotate(27deg);
+  border-color: rgba(190,216,255,.17);
+}
+.core-orbit.o4 {
+  width: 130%;
+  height: 25%;
+  transform: rotate(16deg);
+  border-color: rgba(220,234,255,.2);
+}
+.core-planet {
+  position: relative;
+  z-index: 3;
+  width: 40%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 29% 23%, #fff 0, #dceaff 3%, #94accd 10%, #536783 22%, #1b2638 46%, #080c13 72%);
+  box-shadow:
+    0 0 1px 1px rgba(230,241,255,.8),
+    0 0 40px rgba(158,198,255,.35),
+    0 0 115px rgba(112,165,243,.17),
+    inset -24px -25px 35px #03050a,
+    inset 5px 5px 20px rgba(255,255,255,.18);
+}
+.core-planet::before {
+  content: "";
+  position: absolute;
+  inset: -5%;
+  border-radius: 50%;
+  border: 1px solid rgba(222,239,255,.4);
+}
+.core-planet::after {
+  content: "";
+  position: absolute;
+  top: 48%;
+  left: -32%;
+  width: 164%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e4f0ff, #9ecaff, transparent);
+  box-shadow: 0 0 15px #a6caff;
+  transform: rotate(-27deg);
+}
+.core-satellite {
+  position: absolute;
+  top: 18%;
+  left: 17%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #dcecff;
+  box-shadow: 0 0 16px #a5caff;
+  z-index: 4;
+}
+.core-satellite.s2 { top: 73%; left: 85%; width: 4px; height: 4px; }
+.core-satellite.s3 { top: 37%; left: 93%; width: 3px; height: 3px; }
+
+.core-label {
+  position: absolute;
+  right: -4%;
+  bottom: 9%;
+  font: 9px/2 var(--mono);
+  color: #8290a4;
+  letter-spacing: .12em;
+}
+.core-label strong { display: block; font-weight: 400; color: #e1ebfa; }
+.core-index {
+  position: absolute;
+  left: 0;
+  top: 23%;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: #697990;
+}
+
+/* SCROLLING TICKER */
+
+.ticker {
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 19px 0;
+}
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: tickerMove 32s linear infinite;
+}
+.ticker-group {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+  padding-right: 35px;
+  color: #99a9bf;
+  font: 10px var(--mono);
+  letter-spacing: .16em;
+}
+.ticker-star { color: #a7cbff; font-size: 15px; }
+@keyframes tickerMove { to { transform: translateX(-50%); } }
+
+/* QUICK FACTS */
+
+.quickfacts {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  border-bottom: 1px solid var(--border);
+}
+.fact {
+  padding: 27px 15px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.fact:last-child { border-right: 0; }
+.fact strong { display: block; font: 500 12px var(--display); margin-bottom: 7px; }
+.fact span { color: #7f8b9d; font: 9px var(--mono); }
+
+/* GENERAL SECTIONS */
+
+.section {
+  padding: 140px 7vw;
+  position: relative;
+}
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 58px;
+}
+.section-index { color: #91a9cc; }
+.section h2 {
+  margin: 21px 0 0;
+  font: 500 clamp(42px,6vw,78px)/.98 var(--display);
+  letter-spacing: -.075em;
+}
+.section-copy {
+  max-width: 420px;
+  color: #929dad;
+  font-size: 12px;
+  line-height: 2;
+}
+
+/* EXPERIENCE LIST */
+
+.experience-list { border-top: 1px solid var(--border); }
+.experience-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 65px 1fr 1.1fr 30px;
+  align-items: center;
+  gap: 23px;
+  padding: 29px 0;
+  border-bottom: 1px solid var(--border);
+  transition: padding .35s;
+}
+.experience-item:hover { padding-left: 12px; padding-right: 12px; }
+.experience-number { color: #718198; font: 10px var(--mono); }
+.experience-title {
+  font: 500 clamp(18px,2.5vw,29px) var(--display);
+  letter-spacing: -.045em;
+}
+.experience-desc { color: #929dad; font-size: 11px; line-height: 1.9; }
+.experience-arrow { color: #a5c9ff; font-size: 20px; transition: transform .3s; }
+.experience-item:hover .experience-arrow { transform: translate(4px,-4px); }
+
+/* SHOWCASE / VISUAL LANGUAGE */
+
+.showcase {
+  padding: 110px 7vw 140px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.showcase-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 30px;
+  margin-bottom: 55px;
+}
+.showcase-header h2 {
+  font: 500 clamp(42px,6vw,76px)/1 var(--display);
+  letter-spacing: -.075em;
+  margin: 20px 0 0;
+}
+.showcase-header p {
+  max-width: 340px;
+  color: #8f9aaa;
+  font-size: 12px;
+  line-height: 2;
+}
+.visual-grid {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 18px;
+}
+.visual-panel {
+  position: relative;
+  overflow: hidden;
+  min-height: 390px;
+  border: 1px solid rgba(196,216,250,.15);
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(78,112,171,.13), transparent 62%),
+    linear-gradient(145deg, rgba(255,255,255,.025), transparent);
+}
+.visual-panel.small { min-height: 390px; }
+.panel-label {
+  position: absolute;
+  left: 23px;
+  top: 22px;
+  z-index: 3;
+  color: #91a2bb;
+}
+.panel-caption {
+  position: absolute;
+  bottom: 22px;
+  left: 23px;
+  right: 23px;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  color: #8794a7;
+}
+.panel-caption strong { color: #dbe8fb; font-weight: 500; }
+
+.mini-core {
+  position: absolute;
+  width: 195px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  left: 50%;
+  top: 49%;
+  transform: translate(-50%,-50%);
+  background: radial-gradient(circle at 30% 23%, #fff, #9cb8e1 7%, #425875 25%, #0c111a 62%, #03050a 76%);
+  box-shadow: 0 0 45px rgba(132,180,246,.2), inset -20px -20px 25px #020307;
+}
+.mini-core::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  border: 1px solid rgba(187,214,255,.48);
+  border-radius: 50%;
+  transform: scaleY(.45) rotate(-25deg);
+}
+.mini-core::after {
+  content: "";
+  position: absolute;
+  inset: -44%;
+  border: 1px solid rgba(174,205,250,.18);
+  border-radius: 50%;
+  transform: scaleY(.75) rotate(45deg);
+}
+.mini-ring {
+  position: absolute;
+  left: 50%;
+  top: 49%;
+  width: 300px;
+  height: 150px;
+  transform: translate(-50%,-50%) rotate(55deg);
+  border: 1px solid rgba(171,205,255,.24);
+  border-radius: 50%;
+}
+.wave-art {
+  position: absolute;
+  inset: 15% 4% 14%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.wave-art span {
+  display: block;
+  width: 2px;
+  height: 25%;
+  background: linear-gradient(180deg, transparent, #b9d7ff, #728bb5, transparent);
+  opacity: .7;
+  animation: waveform 2.5s ease-in-out infinite alternate;
+}
+.wave-art span:nth-child(3n) { animation-delay: -.7s; }
+.wave-art span:nth-child(4n) { animation-delay: -1.2s; }
+.wave-art span:nth-child(5n) { animation-delay: -.4s; }
+@keyframes waveform {
+  from { transform: scaleY(.3); opacity: .3; }
+  to { transform: scaleY(1.8); opacity: .85; }
+}
+
+/* MANIFESTO */
+
+.manifesto {
+  padding: 130px 7vw 150px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.manifesto::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(80vw, 850px);
+  aspect-ratio: 1;
+  transform: translate(-50%,-50%);
+  border: 1px solid rgba(166,198,247,.07);
+  border-radius: 50%;
+  box-shadow: 0 0 0 65px rgba(166,198,247,.015), 0 0 0 130px rgba(166,198,247,.01);
+}
+.manifesto > * { position: relative; }
+.manifesto h2 {
+  max-width: 1000px;
+  margin: 30px auto;
+  font: 500 clamp(45px,8vw,100px)/.98 var(--display);
+  letter-spacing: -.085em;
+}
+.manifesto p {
+  max-width: 500px;
+  margin: 0 auto;
+  color: #919bab;
+  font-size: 12px;
+  line-height: 2;
+}
+
+/* FOUNDER STORY */
+
+.founder-section {
+  padding: 140px 7vw;
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  gap: 7vw;
+  align-items: start;
+  position: relative;
+}
+.founder-art {
+  position: relative;
+  min-height: 410px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(197,218,252,.14);
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(84,126,192,.14), transparent 55%),
+    linear-gradient(145deg, rgba(255,255,255,.025), transparent);
+}
+.founder-art::before,
+.founder-art::after {
+  content: "";
+  position: absolute;
+  width: 290px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(194,216,250,.18);
+  border-radius: 50%;
+}
+.founder-art::after {
+  width: 230px;
+  border-style: dashed;
+  border-color: rgba(194,216,250,.15);
+  animation: spin 70s linear infinite;
+}
+.founder-monogram {
+  z-index: 2;
+  font: 500 clamp(70px,9vw,110px)/1 var(--display);
+  letter-spacing: -.12em;
+  padding-right: .12em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(224,237,255,.78);
+  text-shadow: 0 0 45px rgba(152,192,255,.1);
+}
+.founder-orbit {
+  position: absolute;
+  width: 320px;
+  height: 115px;
+  border: 1px solid rgba(192,218,255,.48);
+  border-radius: 50%;
+  transform: rotate(-35deg);
+}
+.founder-orbit.two { transform: rotate(45deg); border-color: rgba(192,218,255,.2); }
+
+.founder-content { padding-top: 5px; }
+.founder-role { color: #9dbbe5; }
+.founder-content h2 {
+  margin: 25px 0;
+  font: 500 clamp(43px,5.5vw,72px)/.99 var(--display);
+  letter-spacing: -.08em;
+}
+.founder-content h2 .name {
+  background: linear-gradient(100deg, #fff, #a3c6fa 65%, #d8e7ff);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.founder-content p {
+  color: #969faf;
+  font-size: 12px;
+  line-height: 2.1;
+  max-width: 560px;
+}
+.founder-signature {
+  margin-top: 32px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.founder-signature strong { font: 500 14px var(--display); }
+.founder-signature span { color: #78869a; }
+
+/* TIMELINE */
+
+.roadmap {
+  padding: 100px 7vw 140px;
+  border-top: 1px solid var(--border);
+}
+.roadmap-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 35px;
+  margin-bottom: 55px;
+}
+.roadmap-heading h2 {
+  font: 500 clamp(43px,6vw,75px)/1 var(--display);
+  letter-spacing: -.075em;
+  margin: 20px 0 0;
+}
+.roadmap-heading p { max-width: 350px; color: #929dad; font-size: 12px; line-height: 2; }
+.roadmap-list { border-top: 1px solid var(--border); }
+.roadmap-row {
+  display: grid;
+  grid-template-columns: 65px 1fr 1.1fr;
+  gap: 25px;
+  padding: 27px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+.roadmap-num { color: #8395ae; }
+.roadmap-title { font: 500 18px var(--display); }
+.roadmap-desc { color: #909baa; font-size: 11px; line-height: 1.9; }
+
+/* DOWNLOAD */
+
+.download-section { padding: 20px 5vw 130px; }
+.download-box {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(45px,8vw,95px) 25px;
+  text-align: center;
+  border: 1px solid rgba(203,223,255,.2);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(95,144,218,.16), transparent 58%),
+    linear-gradient(140deg, rgba(255,255,255,.025), transparent);
+}
+.download-box::before {
+  content: "";
+  position: absolute;
+  inset: 11px;
+  border: 1px solid rgba(209,227,255,.065);
+  pointer-events: none;
+}
+.download-sigil {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 26px;
+  border: 1px solid rgba(221,236,255,.7);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #e8f2ff;
+  font-size: 23px;
+  box-shadow: 0 0 45px rgba(123,174,244,.13);
+}
+.download-box h2 {
+  position: relative;
+  margin: 24px 0;
+  font: 500 clamp(46px,7.5vw,91px)/.95 var(--display);
+  letter-spacing: -.085em;
+}
+.download-box h2 span {
+  background: linear-gradient(100deg, #fff, #9ebff0);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.download-box p {
+  position: relative;
+  max-width: 510px;
+  margin: 0 auto;
+  color: #929eaf;
+  font-size: 12px;
+  line-height: 2;
+}
+.download-actions {
+  position: relative;
+  margin-top: 33px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.download-note {
+  display: block;
+  position: relative;
+  margin-top: 22px;
+  color: #7d8a9e;
+}
+
+/* FOOTER */
+
+.footer {
+  padding: 29px 5vw 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  color: #7f8b9c;
+}
+.footer .brand { color: #e6edf8; }
+.footer-copy, .footer a:not(.brand) { font: 9px var(--mono); letter-spacing: .1em; }
+
+/* REVEALS */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(25px);
+  transition: opacity 1s ease, transform 1s cubic-bezier(.2,.7,.2,1);
+}
+.reveal.in-view { opacity: 1; transform: translateY(0); }
+.reveal.delay-1 { transition-delay: .12s; }
+.reveal.delay-2 { transition-delay: .24s; }
+.reveal.delay-3 { transition-delay: .36s; }
+
+/* RESPONSIVE */
+
+@media(max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding-top: 140px;
+  }
+  .hero-copy { display: flex; flex-direction: column; align-items: center; }
+  .overline { justify-content: center; }
+  .hero h1 { font-size: clamp(65px,12vw,105px); }
+  .hero-description { margin-left: auto; margin-right: auto; }
+  .hero-buttons, .hero-facts { justify-content: center; }
+  .core-stage { min-height: 490px; }
+  .core-halo { width: min(65vw,460px); }
+  .core-index { display: none; }
+  .section-heading, .showcase-header, .roadmap-heading { flex-direction: column; align-items: start; }
+  .section-copy, .showcase-header p, .roadmap-heading p { max-width: 600px; }
+  .experience-item { grid-template-columns: 42px 1fr 30px; gap: 15px; }
+  .experience-desc { grid-column: 2; grid-row: 2; }
+  .experience-arrow { grid-column: 3; grid-row: 1; }
+  .founder-section { grid-template-columns: 1fr; gap: 45px; }
+  .founder-art { min-height: 350px; }
+}
+@media(max-width: 600px) {
+  .topbar { padding: 19px 19px; }
+  .navlinks { gap: 14px; }
+  .navlinks a:not(.nav-download) { display: none; }
+  .nav-download { padding: 10px 12px; }
+  .hero { padding: 130px 21px 55px; }
+  .hero h1 { font-size: clamp(57px,14vw,82px); margin-top: 30px; }
+  .hero-description { font-size: 12px; }
+  .hero-facts { gap: 9px; }
+  .core-stage { min-height: 360px; }
+  .core-halo { width: min(76vw,360px); }
+  .core-label { font-size: 8px; right: -1%; bottom: 6%; }
+  .quickfacts { grid-template-columns: repeat(2,1fr); }
+  .fact:nth-child(2) { border-right: 0; }
+  .fact:nth-child(-n+2) { border-bottom: 1px solid var(--border); }
+  .section { padding: 90px 22px; }
+  .section-heading { margin-bottom: 38px; }
+  .section h2 { font-size: 48px; }
+  .experience-item { padding: 24px 0; }
+  .experience-title { font-size: 19px; }
+  .experience-desc { font-size: 10px; }
+  .showcase { padding: 90px 22px; }
+  .visual-grid { grid-template-columns: 1fr; }
+  .visual-panel, .visual-panel.small { min-height: 320px; }
+  .manifesto { padding: 95px 22px; }
+  .manifesto h2 { font-size: 49px; }
+  .founder-section { padding: 90px 22px; }
+  .founder-art { min-height: 290px; }
+  .founder-content h2 { font-size: 48px; }
+  .roadmap { padding: 90px 22px; }
+  .roadmap-row { grid-template-columns: 35px 1fr; gap: 12px; }
+  .roadmap-desc { grid-column: 2; }
+  .download-section { padding: 0 13px 90px; }
+  .download-box { padding: 60px 19px; }
+  .download-box h2 { font-size: 50px; }
+  .footer { padding: 25px 22px; }
+  .cine-coordinate { font-size: 8px; }
+  .cine-coordinate.tl { top: 14px; left: 14px; }
+  .cine-coordinate.tr { top: 14px; right: 14px; }
+  .cine-coordinate.bl { bottom: 14px; left: 14px; }
+  .cine-coordinate.br { bottom: 14px; right: 14px; }
+  .cine-bottom { bottom: 15px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+
+<body class="intro-active">
+
+<canvas id="universe" aria-hidden="true"></canvas>
+<div id="light-field"></div>
+<div id="grain"></div>
+<div class="pointer-glow" id="pointerGlow"></div>
+
+<!-- =======================================================
+     CINEMATIC INTRO
+     ======================================================= -->
+
+<div id="cinematic" aria-label="Astra introduction">
+  <div class="cine-grid"></div>
+  <div class="cine-vignette"></div>
+
+  <div class="cine-coordinate tl mono">
+    ASTRA SYSTEMS<br>
+    INDEPENDENT PROJECT
+  </div>
+  <div class="cine-coordinate tr mono">
+    FIELD 001<br>
+    PERSONAL INTELLIGENCE
+  </div>
+  <div class="cine-coordinate bl mono">
+    DESIGNED TO EXPLORE<br>
+    BUILT FROM CURIOSITY
+  </div>
+  <div class="cine-coordinate br mono">
+    FOUNDER / CREATOR<br>
+    DARSH BHAVSAR
+  </div>
+
+  <div class="cine-center">
+    <div class="cine-emblem" aria-hidden="true">
+      <div class="cine-ring r5"></div>
+      <div class="cine-ring r4"></div>
+      <div class="cine-ring r3"></div>
+      <div class="cine-ring r2"></div>
+      <div class="cine-ring"></div>
+      <div class="cine-core"></div>
+      <div class="cine-satellite"></div>
+      <div class="cine-satellite s2"></div>
+      <div class="cine-satellite s3"></div>
+    </div>
+
+    <div class="cine-overline mono">A NEW INTELLIGENCE EXPERIENCE</div>
+    <div class="cine-wordmark">ASTRA</div>
+    <div class="cine-tagline">Beyond the interface. Beyond the expected.</div>
+    <div class="cine-founder mono">CREATED BY DARSH BHAVSAR</div>
+  </div>
+
+  <div class="cine-bottom">
+    <div class="cine-progress"><span></span></div>
+    <button id="enterNow" class="cine-enter mono">ENTER THE EXPERIENCE ↗</button>
+  </div>
+</div>
+
+<!-- =======================================================
+     MAIN WEBSITE
+     ======================================================= -->
+
+<div id="site">
+
+  <header class="topbar">
+    <a href="#home" class="brand">
+      <span class="brand-icon"></span>
+      ASTRA
+    </a>
+
+    <nav class="navlinks">
+      <a href="#experience">Experience</a>
+      <a href="#creator">Creator</a>
+      <a href="#vision">Vision</a>
+      <a class="nav-download" href="#download">Get Astra ↗</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-copy">
+      <div class="overline mono reveal">A personal intelligence project</div>
+
+      <h1 class="reveal delay-1">
+        <span>Think</span>
+        <span class="stroke">beyond.</span>
+        <span>Imagine</span>
+        <span class="gradient">what's next.</span>
+      </h1>
+
+      <p class="hero-description reveal delay-2">
+        Introducing Astra AI — a personal AI experience created by
+        Darsh Bhavsar. A project exploring the possibilities of intelligence,
+        creativity and a more expressive digital world.
+      </p>
+
+      <div class="hero-buttons reveal delay-3">
+        <a href="#download" class="btn btn-light">
+          Explore Astra <span class="arrow">↗</span>
+        </a>
+        <a href="#experience" class="btn">
+          Discover the vision <span class="arrow">↓</span>
+        </a>
+      </div>
+
+      <div class="hero-facts reveal delay-3">
+        <span>INDEPENDENTLY CREATED</span>
+        <i></i>
+        <span>ANDROID APPLICATION</span>
+        <i></i>
+        <span>AN EVOLVING PROJECT</span>
+      </div>
+    </div>
+
+    <div class="core-stage reveal delay-2">
+      <div class="core-index mono">ASTRA / FIG. 001 / THE CORE</div>
+      <div class="core-halo" id="coreHalo">
+        <div class="core-ticks"></div>
+        <div class="core-orbit o4"></div>
+        <div class="core-orbit o3"></div>
+        <div class="core-orbit o2"></div>
+        <div class="core-orbit"></div>
+        <div class="core-planet"></div>
+        <div class="core-satellite"></div>
+        <div class="core-satellite s2"></div>
+        <div class="core-satellite s3"></div>
+      </div>
+      <div class="core-label mono">
+        <strong>ASTRA / CORE</strong>
+        VISUAL STUDY 001<br>
+        PERSONAL AI
+      </div>
+    </div>
+  </section>
+
+  <!-- MOVING BRAND STRIP -->
+  <div class="ticker" aria-label="Astra themes">
+    <div class="ticker-track">
+      <div class="ticker-group">
+        <span>INTELLIGENCE</span><span class="ticker-star">✳</span>
+        <span>IMAGINATION</span><span class="ticker-star">✳</span>
+        <span>NEW POSSIBILITIES</span><span class="ticker-star">✳</span>
+        <span>CREATIVE TECHNOLOGY</span><span class="ticker-star">✳</span>
+        <span>BEYOND THE INTERFACE</span><span class="ticker-star">✳</span>
+      </div>
+      <div class="ticker-group" aria-hidden="true">
+        <span>INTELLIGENCE</span><span class="ticker-star">✳</span>
+        <span>IMAGINATION</span><span class="ticker-star">✳</span>
+        <span>NEW POSSIBILITIES</span><span class="ticker-star">✳</span>
+        <span>CREATIVE TECHNOLOGY</span><span class="ticker-star">✳</span>
+        <span>BEYOND THE INTERFACE</span><span class="ticker-star">✳</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="quickfacts">
+    <div class="fact">
+      <strong>PERSONAL AI</strong>
+      <span>YOUR DIGITAL SPACE</span>
+    </div>
+    <div class="fact">
+      <strong>LIQUID DESIGN</strong>
+      <span>MADE TO FEEL DIFFERENT</span>
+    </div>
+    <div class="fact">
+      <strong>INDEPENDENT</strong>
+      <span>BUILT WITH CURIOSITY</span>
+    </div>
+    <div class="fact">
+      <strong>IN DEVELOPMENT</strong>
+      <span>ALWAYS EVOLVING</span>
+    </div>
+  </div>
+
+  <!-- EXPERIENCE -->
+  <section class="section" id="experience">
+    <div class="section-heading reveal">
+      <div>
+        <div class="section-index mono">01 / THE EXPERIENCE</div>
+        <h2>Not another<br>ordinary interface.</h2>
+      </div>
+      <p class="section-copy">
+        Astra brings together an interest in artificial intelligence,
+        immersive design and futuristic visual language. Every detail is
+        intended to make the experience feel considered, expressive and personal.
+      </p>
+    </div>
+
+    <div class="experience-list">
+      <div class="experience-item reveal">
+        <span class="experience-number">01</span>
+        <div class="experience-title">Conversational intelligence</div>
+        <div class="experience-desc">
+          A place to ask questions, explore concepts, work through ideas
+          and develop your thinking.
+        </div>
+        <span class="experience-arrow">↗</span>
+      </div>
+
+      <div class="experience-item reveal">
+        <span class="experience-number">02</span>
+        <div class="experience-title">A living visual language</div>
+        <div class="experience-desc">
+          Deep space, metallic surfaces, controlled illumination,
+          dimensional forms and purposeful motion.
+        </div>
+        <span class="experience-arrow">↗</span>
+      </div>
+
+      <div class="experience-item reveal">
+        <span class="experience-number">03</span>
+        <div class="experience-title">Space for imagination</div>
+        <div class="experience-desc">
+          An evolving creative project built around curiosity,
+          experimentation and the desire to build something original.
+        </div>
+        <span class="experience-arrow">↗</span>
+      </div>
+
+      <div class="experience-item reveal">
+        <span class="experience-number">04</span>
+        <div class="experience-title">A bigger possibility</div>
+        <div class="experience-desc">
+          A foundation for exploring what a personal digital assistant
+          can become through design, development and continued learning.
+        </div>
+        <span class="experience-arrow">↗</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISUAL STUDY -->
+  <section class="showcase" id="vision">
+    <div class="showcase-header reveal">
+      <div>
+        <div class="section-index mono">02 / VISUAL RESEARCH</div>
+        <h2>Made of light.<br>Built around ideas.</h2>
+      </div>
+      <p>
+        A visual identity inspired by celestial geometry, liquid-metal
+        reflections, astronomical instruments and the quiet intensity of deep space.
+      </p>
+    </div>
+
+    <div class="visual-grid">
+      <div class="visual-panel reveal">
+        <div class="panel-label mono">STUDY 001 / THE CORE</div>
+        <div class="mini-ring"></div>
+        <div class="mini-core"></div>
+        <div class="panel-caption mono">
+          <strong>THE ASTRA FIELD</strong>
+          <span>01 / 03</span>
+        </div>
+      </div>
+
+      <div class="visual-panel small reveal delay-1">
+        <div class="panel-label mono">STUDY 002 / SIGNAL</div>
+        <div class="wave-art" id="waveArt" aria-hidden="true"></div>
+        <div class="panel-caption mono">
+          <strong>IDEAS IN MOTION</strong>
+          <span>02 / 03</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="manifesto">
+    <div class="mono section-index reveal">03 / THE PRINCIPLE</div>
+    <h2 class="reveal">
+      Technology should feel like
+      <span class="blue">possibility.</span>
+    </h2>
+    <p class="reveal">
+      Not just another screen. Not just another tool.
+      A personal project exploring the relationship between intelligent
+      technology, meaningful design and the freedom to imagine what comes next.
+    </p>
+  </section>
+
+  <!-- CREATOR -->
+  <section class="founder-section" id="creator">
+    <div class="founder-art reveal">
+      <div class="founder-orbit two"></div>
+      <div class="founder-orbit"></div>
+      <div class="founder-monogram">DB</div>
+      <div class="panel-label mono">THE PERSON BEHIND THE PROJECT</div>
+      <div class="panel-caption mono">
+        <strong>CREATOR / FOUNDER</strong>
+        <span>INDIA</span>
+      </div>
+    </div>
+
+    <div class="founder-content reveal delay-1">
+      <div class="founder-role mono">04 / THE HUMAN BEHIND ASTRA</div>
+
+      <h2>
+        Meet the mind<br>
+        behind <span class="name">Astra.</span>
+      </h2>
+
+      <p>
+        Hello, I'm <strong style="color:#eef4ff">Darsh Bhavsar</strong> —
+        the founder, creator and developer of Astra AI.
+      </p>
+
+      <p>
+        I'm building Astra from a curiosity about artificial intelligence,
+        a passion for futuristic interfaces and a belief that personal
+        technology can be both useful and visually expressive.
+        What started as an idea is becoming an ongoing journey in design,
+        development and experimentation.
+      </p>
+
+      <p>
+        Astra is an independent project shaped by learning, persistence
+        and the ambition to create something of my own. This is only the
+        beginning of the journey.
+      </p>
+
+      <div class="founder-signature">
+        <strong>Darsh Bhavsar</strong>
+        <span class="mono">FOUNDER · CREATOR · DEVELOPER OF ASTRA AI</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE JOURNEY -->
+  <section class="roadmap">
+    <div class="roadmap-heading reveal">
+      <div>
+        <div class="section-index mono">05 / THE JOURNEY</div>
+        <h2>One idea.<br>Many possibilities.</h2>
+      </div>
+      <p>
+        Astra is an evolving project. Its future will be shaped by
+        experimentation, development and the lessons learned along the way.
+      </p>
+    </div>
+
+    <div class="roadmap-list">
+      <div class="roadmap-row reveal">
+        <div class="roadmap-num mono">PHASE 01</div>
+        <div class="roadmap-title">The beginning</div>
+        <div class="roadmap-desc">
+          Turning an idea into a working Android application and establishing
+          Astra's core identity.
+        </div>
+      </div>
+
+      <div class="roadmap-row reveal">
+        <div class="roadmap-num mono">PHASE 02</div>
+        <div class="roadmap-title">The experience</div>
+        <div class="roadmap-desc">
+          Exploring interface design, interaction, personalization and
+          the details that make an assistant feel unique.
+        </div>
+      </div>
+
+      <div class="roadmap-row reveal">
+        <div class="roadmap-num mono">PHASE 03</div>
+        <div class="roadmap-title">The possibilities</div>
+        <div class="roadmap-desc">
+          Continuing to investigate new capabilities, creative tools
+          and directions for the project as development progresses.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANDROID DOWNLOAD -->
+  <section class="download-section" id="download">
+    <div class="download-box reveal">
+      <div class="download-sigil">✳</div>
+      <div class="mono section-index">06 / STEP INTO ASTRA</div>
+
+      <h2>
+        Your next idea<br>
+        starts <span>here.</span>
+      </h2>
+
+      <p>
+        Discover the Android version of Astra AI.
+        Open a new space for questions, curiosity and exploration.
+        Be part of the journey as the project continues to evolve.
+      </p>
+
+      <div class="download-actions">
+        <a
+          class="btn btn-light"
+          href="https://github.com/darshbhavsar2008-ops/astra-download/releases/download/v1.0.0/app-release.apk">
+          Download Astra APK <span class="arrow">↓</span>
+        </a>
+
+        <a class="btn" href="#home">
+          Return to the beginning <span class="arrow">↑</span>
+        </a>
+      </div>
+
+      <span class="download-note mono">
+        ANDROID APK / VERSION 1.0.0
+      </span>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <a href="#home" class="brand">
+      <span class="brand-icon"></span>
+      ASTRA
+    </a>
+
+    <div class="footer-copy">
+      AN INDEPENDENT PROJECT BY DARSH BHAVSAR
+    </div>
+
+    <a href="#creator">MEET THE CREATOR ↗</a>
+
+    <div class="footer-copy">
+      © <span id="year"></span> ASTRA
+    </div>
+  </footer>
+</div>
+
+<script>
+/* =========================================================
+   COSMIC PARTICLE FIELD
+   ========================================================= */
+
+(() => {
+  const canvas = document.getElementById("universe");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let width = 0;
+  let height = 0;
+  let ratio = 1;
+  let stars = [];
+  let frame = 0;
+
+  function resize() {
+    ratio = Math.min(devicePixelRatio || 1, 2);
+    width = innerWidth;
+    height = innerHeight;
+
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    const count = Math.min(210, Math.floor(width * height / 5500));
+
+    stars = Array.from({ length: count }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: Math.random() * 1.15 + .15,
+      opacity: Math.random() * .6 + .12,
+      phase: Math.random() * Math.PI * 2,
+      drift: Math.random() * .12 + .015
+    }));
+
+    paint();
+  }
+
+  function paint(time = 0) {
+    ctx.clearRect(0, 0, width, height);
+
+    for (const star of stars) {
+      const pulse = reduceMotion ? 0 : Math.sin(time * .0005 + star.phase) * .17;
+
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,222,255,${Math.max(.05, star.opacity + pulse)})`;
+      ctx.fill();
+
+      if (!reduceMotion) {
+        star.y -= star.drift * .12;
+        if (star.y < -3) {
+          star.y = height + 3;
+          star.x = Math.random() * width;
+        }
+      }
+    }
+
+    if (!reduceMotion && !document.hidden) {
+      frame = requestAnimationFrame(paint);
+    }
+  }
+
+  addEventListener("resize", resize);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      cancelAnimationFrame(frame);
+    } else if (!reduceMotion) {
+      frame = requestAnimationFrame(paint);
+    }
+  });
+
+  resize();
+})();
+
+/* =========================================================
+   INTRO TRANSITION
+   ========================================================= */
+
+(() => {
+  const intro = document.getElementById("cinematic");
+  const site = document.getElementById("site");
+  const enter = document.getElementById("enterNow");
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let completed = false;
+  let timer;
+
+  function revealVisibleSections() {
+    document.querySelectorAll(".reveal").forEach(element => {
+      if (element.getBoundingClientRect().top < innerHeight * .92) {
+        element.classList.add("in-view");
+      }
+    });
+  }
+
+  function enterSite() {
+    if (completed) return;
+    completed = true;
+    clearTimeout(timer);
+
+    intro.classList.add("dismissed");
+    intro.setAttribute("aria-hidden", "true");
+    site.classList.add("visible");
+    document.body.classList.remove("intro-active");
+
+    revealVisibleSections();
+
+    try {
+      sessionStorage.setItem("astra-intro-completed", "yes");
+    } catch (_) {}
+  }
+
+  let visited = false;
+
+  try {
+    visited = sessionStorage.getItem("astra-intro-completed") === "yes";
+  } catch (_) {}
+
+  enter.addEventListener("click", enterSite);
+
+  if (visited || reduceMotion) {
+    enterSite();
+  } else {
+    // The opening sequence stays on screen long enough to feel cinematic.
+    timer = setTimeout(enterSite, 18000);
+  }
+})();
+
+/* =========================================================
+   SCROLL REVEAL
+   ========================================================= */
+
+const revealElements = document.querySelectorAll(".reveal");
+
+if ("IntersectionObserver" in window) {
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("in-view");
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: .12,
+    rootMargin: "0px 0px -25px 0px"
+  });
+
+  revealElements.forEach(element => revealObserver.observe(element));
+} else {
+  revealElements.forEach(element => element.classList.add("in-view"));
+}
+
+/* =========================================================
+   SUBTLE INTERACTIVE LIGHT
+   ========================================================= */
+
+(() => {
+  const glow = document.getElementById("pointerGlow");
+  const finePointer = matchMedia("(pointer: fine)").matches;
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!finePointer || reduceMotion) return;
+
+  let lastMove = 0;
+
+  addEventListener("pointermove", event => {
+    const now = performance.now();
+    if (now - lastMove < 16) return;
+    lastMove = now;
+
+    glow.style.left = event.clientX + "px";
+    glow.style.top = event.clientY + "px";
+  });
+})();
+
+/* =========================================================
+   GENTLE PARALLAX FOR THE CENTRAL INSTRUMENT
+   ========================================================= */
+
+(() => {
+  const stage = document.querySelector(".core-stage");
+  const halo = document.getElementById("coreHalo");
+
+  if (!stage || !halo) return;
+  if (!matchMedia("(pointer: fine)").matches) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  stage.addEventListener("pointermove", event => {
+    const rect = stage.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - .5;
+    const y = (event.clientY - rect.top) / rect.height - .5;
+
+    halo.style.translate = `${x * 11}px ${y * 11}px`;
+  });
+
+  stage.addEventListener("pointerleave", () => {
+    halo.style.translate = "0 0";
+  });
+})();
+
+/* =========================================================
+   SIGNAL WAVE ARTWORK
+   ========================================================= */
+
+(() => {
+  const wave = document.getElementById("waveArt");
+  if (!wave) return;
+
+  const fragment = document.createDocumentFragment();
+
+  for (let i = 0; i < 39; i++) {
+    const bar = document.createElement("span");
+    bar.style.height = (15 + Math.abs(Math.sin(i * .31) * 60)) + "%";
+    bar.style.animationDelay = (-Math.random() * 2.5) + "s";
+    fragment.appendChild(bar);
+  }
+
+  wave.appendChild(fragment);
+})();
+
+/* =========================================================
+   CURRENT YEAR
+   ========================================================= */
+
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
